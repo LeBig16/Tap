@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0d1117" />
+<meta name="description" content="Tap — the easiest way to let the people you love know you're safe." />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<title>Tap — One Tap. Peace of Mind.</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='42' fill='%233ddc97'/></svg>" />
+<style>
+  :root{
+    --bg:#0b0f14; --card:#151b23; --card2:#1c242f; --line:#2a3340; --line2:#374253;
+    --txt:#e9f0f7; --muted:#94a3b6; --dim:#6b7a8d;
+    --accent:#3ddc97; --accent2:#22a06b; --accentDim:rgba(61,220,151,.12);
+    --warn:#f0b429; --danger:#ff5a5f; --blue:#4d9dff; --purple:#b78cff;
+    --radius:20px; --tap:230px;
+  }
+  body.light{
+    --bg:#f4f7fa; --card:#ffffff; --card2:#eef2f7; --line:#dde5ee; --line2:#c9d5e3;
+    --txt:#0f1a26; --muted:#5b6b7d; --dim:#8899aa; --accentDim:rgba(34,160,107,.12);
+  }
+  body.elder{ --tap:270px; }
+  body.elder .muted, body.elder .sub{ font-size:15px }
+  body.elder .name{ font-size:17px }
+  body.elder nav button{ font-size:13px }
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--txt);
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       min-height:100vh;display:flex;justify-content:center;transition:background .3s}
+  .phone{width:100%;max-width:440px;min-height:100vh;display:flex;flex-direction:column;position:relative;
+         background:radial-gradient(900px 420px at 50% -8%,rgba(61,220,151,.10),transparent 62%)}
+  header{padding:16px 20px 6px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .greet{font-size:13px;color:var(--muted)}
+  .greetName{font-size:23px;font-weight:800;letter-spacing:-.4px;margin-top:1px}
+  .hbtns{display:flex;align-items:center;gap:8px;padding-top:4px}
+  .iconbtn{width:36px;height:36px;border-radius:50%;background:var(--card);border:1px solid var(--line);
+           display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:15px}
+  .pill{font-size:10.5px;padding:4px 9px;border-radius:999px;background:var(--card2);border:1px solid var(--line);
+        color:var(--muted);white-space:nowrap}
+  .pill.pro{color:var(--warn);border-color:rgba(240,180,41,.5);background:rgba(240,180,41,.1)}
+  main{flex:1;padding:4px 18px 110px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  nav{position:fixed;bottom:0;width:100%;max-width:440px;display:flex;
+      background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(16px);
+      border-top:1px solid var(--line);z-index:40}
+  nav button{flex:1;background:none;border:0;color:var(--dim);padding:10px 2px 16px;font-size:10.5px;
+             display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font-family:inherit}
+  nav button.on{color:var(--accent)}
+  nav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:13px}
+  .card.tight{padding:12px 16px}
+  .card h3{margin:0 0 3px;font-size:15px;font-weight:700}
+  .muted{color:var(--muted);font-size:13px;line-height:1.55;margin:0}
+  .sub{font-size:12px;color:var(--muted)}
+  h2.section{font-size:11.5px;text-transform:uppercase;letter-spacing:1.3px;color:var(--dim);
+             margin:20px 0 9px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+  h2.section .link{text-transform:none;letter-spacing:0;font-size:12px}
+  .link{color:var(--blue);cursor:pointer;font-size:13px;font-weight:600}
+  .center{text-align:center}
+
+  button.btn{width:100%;padding:14px;border-radius:14px;border:0;background:var(--accent);color:#052419;
+             font-weight:700;font-size:15px;cursor:pointer;font-family:inherit}
+  button.btn:active{opacity:.85}
+  button.ghost{background:var(--card2);color:var(--txt);border:1px solid var(--line)}
+  button.danger{background:var(--danger);color:#fff}
+  button.warn{background:var(--warn);color:#2a1c00}
+  button.small{width:auto;padding:9px 15px;font-size:13px;border-radius:11px}
+  input,select,textarea{width:100%;padding:13px;border-radius:13px;border:1px solid var(--line);background:var(--card2);
+               color:var(--txt);font-size:15px;margin-bottom:10px;font-family:inherit}
+  label.lbl{font-size:11.5px;color:var(--muted);display:block;margin:0 0 6px 3px;font-weight:600}
+
+  /* TAP BUTTON */
+  .tapwrap{display:flex;flex-direction:column;align-items:center;padding:8px 0 2px}
+  .tapouter{position:relative;margin:10px 0 6px;display:flex;align-items:center;justify-content:center}
+  .tapbtn{width:var(--tap);height:var(--tap);border-radius:50%;border:0;cursor:pointer;position:relative;z-index:2;
+          background:radial-gradient(circle at 34% 28%,#6ff2bb,var(--accent) 45%,var(--accent2) 100%);
+          color:#04241a;font-size:30px;font-weight:900;letter-spacing:2px;font-family:inherit;
+          box-shadow:0 0 0 9px var(--accentDim),0 14px 44px rgba(61,220,151,.32);
+          transition:transform .13s cubic-bezier(.3,1.4,.5,1)}
+  .tapbtn:active{transform:scale(.93)}
+  .tapbtn .em{font-size:34px;display:block;line-height:1;margin-bottom:2px}
+  .tapbtn small{display:block;font-size:12.5px;font-weight:700;letter-spacing:.2px;opacity:.72;margin-top:5px;
+                max-width:150px;margin-left:auto;margin-right:auto;line-height:1.3}
+  .ring{position:absolute;width:var(--tap);height:var(--tap);border-radius:50%;border:2.5px solid var(--accent);
+        opacity:0;pointer-events:none;z-index:1}
+  @keyframes pulse{0%{transform:scale(1);opacity:.85}100%{transform:scale(1.62);opacity:0}}
+  .ring.go{animation:pulse .9s ease-out}
+  .sent{position:absolute;z-index:3;font-size:70px;opacity:0;pointer-events:none}
+  @keyframes pop{0%{transform:scale(.3);opacity:0}35%{transform:scale(1.1);opacity:1}70%{transform:scale(1);opacity:1}100%{transform:scale(1.3);opacity:0}}
+  .sent.go{animation:pop 1.1s ease-out}
+
+  .chips{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0 2px}
+  .chips.c{justify-content:center}
+  .chip{padding:8px 13px;border-radius:999px;background:var(--card2);border:1px solid var(--line);
+        color:var(--muted);font-size:12.5px;cursor:pointer;white-space:nowrap;font-weight:500}
+  .chip.on{border-color:var(--accent);color:var(--accent);background:var(--accentDim);font-weight:700}
+  .chip.add{border-style:dashed;color:var(--dim)}
+
+  .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:0}
+  .row.pt0{padding-top:0}
+  .avatar{width:40px;height:40px;border-radius:50%;background:var(--card2);border:1px solid var(--line);
+          display:flex;align-items:center;justify-content:center;font-size:19px;flex:0 0 auto;position:relative}
+  .avatar .st{position:absolute;right:-1px;bottom:-1px;width:12px;height:12px;border-radius:50%;
+              border:2px solid var(--card)}
+  .flex{display:flex;align-items:center;gap:11px;min-width:0;flex:1}
+  .name{font-size:14.5px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .switch{width:46px;height:27px;border-radius:999px;background:var(--card2);border:1px solid var(--line2);
+          position:relative;cursor:pointer;flex:0 0 auto;transition:.18s}
+  .switch i{position:absolute;top:2px;left:2px;width:21px;height:21px;border-radius:50%;background:var(--dim);transition:.18s}
+  .switch.on{background:var(--accentDim);border-color:var(--accent)}
+  .switch.on i{left:21px;background:var(--accent)}
+
+  .timer{font-size:38px;font-weight:800;letter-spacing:1px;text-align:center;margin:4px 0 2px;
+         font-variant-numeric:tabular-nums}
+  .timer.late{color:var(--danger)}
+  .timer.soon{color:var(--warn)}
+  .bar{height:7px;border-radius:99px;background:var(--card2);overflow:hidden;margin-top:10px}
+  .bar i{display:block;height:100%;background:var(--accent);width:0%;transition:width .5s;border-radius:99px}
+  .bar i.late{background:var(--danger)} .bar i.soon{background:var(--warn)}
+
+  .feed{border-left:2px solid var(--line);margin-left:7px;padding-left:17px}
+  .feed .item{position:relative;padding:0 0 15px}
+  .feed .item:before{content:"";position:absolute;left:-24px;top:4px;width:11px;height:11px;border-radius:50%;
+                     background:var(--accent);box-shadow:0 0 0 3.5px var(--bg)}
+  .feed .item.sos:before{background:var(--danger)}
+  .feed .item.miss:before{background:var(--warn)}
+  .feed .item.ai:before{background:var(--purple)}
+  .feed .item.sys:before{background:var(--dim)}
+
+  .badge{font-size:10px;padding:3.5px 9px;border-radius:999px;background:var(--card2);border:1px solid var(--line);
+         color:var(--muted);white-space:nowrap;font-weight:600}
+  .badge.ok{color:var(--accent);border-color:rgba(61,220,151,.45)}
+  .badge.late{color:var(--warn);border-color:rgba(240,180,41,.45)}
+  .badge.bad{color:var(--danger);border-color:rgba(255,90,95,.45)}
+  .badge.pro{color:var(--warn);border-color:var(--warn)}
+  .badge.ai{color:var(--purple);border-color:rgba(183,140,255,.45)}
+  .badge.best{color:#052419;background:var(--accent);border-color:var(--accent)}
+  .price .strike{text-decoration:line-through;opacity:.55}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:13px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:13px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:13px 8px;text-align:center}
+  .stat b{display:block;font-size:22px;font-weight:800;line-height:1.15}
+  .stat span{font-size:10.5px;color:var(--muted);letter-spacing:.2px}
+
+  .sosbox{background:linear-gradient(180deg,rgba(255,90,95,.10),rgba(255,90,95,.03));
+          border:1px solid rgba(255,90,95,.38)}
+  .holdbar{height:8px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:9px}
+  .holdbar i{display:block;height:100%;width:0%;background:#fff;border-radius:99px}
+
+  /* MODAL */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.62);backdrop-filter:blur(4px);z-index:80;
+         display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:.22s}
+  .modal.show{opacity:1;pointer-events:auto}
+  .sheet{width:100%;max-width:440px;background:var(--card);border-radius:24px 24px 0 0;padding:8px 18px 26px;
+         max-height:86vh;overflow-y:auto;transform:translateY(30px);transition:.25s;border-top:1px solid var(--line)}
+  .modal.show .sheet{transform:translateY(0)}
+  .grab{width:40px;height:4px;border-radius:99px;background:var(--line2);margin:6px auto 14px}
+  .mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+  .mhead h3{margin:0;font-size:18px}
+  .check{width:24px;height:24px;border-radius:8px;border:2px solid var(--line2);flex:0 0 auto;
+         display:flex;align-items:center;justify-content:center;font-size:13px;color:transparent}
+  .check.on{background:var(--accent);border-color:var(--accent);color:#052419}
+  .selrow{cursor:pointer}
+
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:100px;background:var(--txt);color:var(--bg);
+         padding:13px 20px;border-radius:999px;font-weight:700;font-size:13.5px;opacity:0;pointer-events:none;
+         transition:.26s;z-index:90;max-width:88%;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,.4)}
+  .toast.show{opacity:1;bottom:116px}
+
+  .auth{padding:32px 24px;display:flex;flex-direction:column;justify-content:center;min-height:100vh}
+  .hide{display:none!important}
+  .price{border:1.5px solid var(--line);border-radius:16px;padding:15px;margin-bottom:10px;cursor:pointer;
+         background:var(--card);position:relative}
+  .price.on{border-color:var(--accent);background:var(--accentDim)}
+  .price b{font-size:15.5px}
+  .price .tag{position:absolute;top:-9px;right:14px}
+
+  .aicard{background:linear-gradient(135deg,rgba(183,140,255,.13),rgba(77,157,255,.07));
+          border:1px solid rgba(183,140,255,.35)}
+  .lock{opacity:.55}
+  .kv{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;color:var(--muted)}
+  .kv b{color:var(--txt);font-weight:650}
+  .batt{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--muted)}
+  .privacy-opt{display:flex;gap:11px;align-items:flex-start;padding:11px;border-radius:13px;
+               border:1.5px solid var(--line);margin-bottom:8px;cursor:pointer;background:var(--card2)}
+  .privacy-opt.on{border-color:var(--accent);background:var(--accentDim)}
+  .radio{width:19px;height:19px;border-radius:50%;border:2px solid var(--line2);flex:0 0 auto;margin-top:2px}
+  .privacy-opt.on .radio{border-color:var(--accent);border-width:6px}
+  .logo-lg{font-size:46px;font-weight:900;letter-spacing:3px;
+           background:linear-gradient(120deg,var(--accent),#7fe9ff);-webkit-background-clip:text;
+           background-clip:text;-webkit-text-fill-color:transparent}
+  .steps{counter-reset:s}
+  .steps .s{display:flex;gap:12px;margin-bottom:14px;align-items:flex-start}
+  .steps .n{width:25px;height:25px;border-radius:50%;background:var(--accentDim);color:var(--accent);
+            display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex:0 0 auto}
+</style>
+</head>
+<body>
+<div class="phone">
+
+<!-- ══════════ ONBOARDING / AUTH ══════════ -->
+<section id="auth" class="auth">
+  <div class="center" style="margin-bottom:24px">
+    <div class="logo-lg">TAP</div>
+    <p class="muted" style="margin-top:6px;font-size:14px">One Tap. Peace of Mind.</p>
+    <p class="muted" style="margin-top:14px">The easiest way to let the people you love know you're safe.</p>
+  </div>
+
+  <div class="card">
+    <div class="steps">
+      <div class="s"><div class="n">1</div><div><div class="name">Add your trusted circle</div><div class="sub">Mom, Dad, your partner, a close friend.</div></div></div>
+      <div class="s"><div class="n">2</div><div><div class="name">Press one big button</div><div class="sub">No typing. No calling. No explaining.</div></div></div>
+      <div class="s"><div class="n">3</div><div><div class="name">They stop worrying</div><div class="sub">"Nick is safe. Updated 2 minutes ago."</div></div></div>
+    </div>
+  </div>
+
+  <label class="lbl">Your name</label>
+  <input id="aName" placeholder="Nick" autocomplete="given-name" />
+  <label class="lbl">Email or phone</label>
+  <input id="aEmail" placeholder="you@example.com" autocomplete="email" />
+  <label class="lbl">Country</label>
+  <select id="aCountry">
+    <option>Netherlands</option><option>Rwanda</option><option>Kenya</option><option>Uganda</option>
+    <option>Nigeria</option><option>South Africa</option><option>United Kingdom</option>
+    <option>United States</option><option>India</option><option>Brazil</option><option>Other</option>
+  </select>
+  <button class="btn" onclick="signup()">Create account — 30 days free</button>
+  <p class="muted center" style="margin-top:12px">No card required. Cancel any time.</p>
+</section>
+
+<!-- ══════════ APP ══════════ -->
+<div id="app" class="hide">
+  <header>
+    <div>
+      <div class="greet" id="greet">Good evening</div>
+      <div class="greetName" id="headName">Nick</div>
+    </div>
+    <div class="hbtns">
+      <span class="pill" id="planPill">Trial</span>
+      <div class="iconbtn" onclick="toggleTheme()" id="themeBtn">🌙</div>
+    </div>
+  </header>
+
+  <main>
+
+  <!-- ───── HOME ───── -->
+  <div id="v-home">
+    <div class="tapwrap">
+      <div class="tapouter">
+        <span class="ring" id="ring"></span>
+        <span class="sent" id="sentMark">✅</span>
+        <button class="tapbtn" onclick="doTap()" id="tapBtn">
+          <span class="em" id="tapEmoji">🟢</span>TAP
+          <small id="tapSub">"I'm Safe"</small>
+        </button>
+      </div>
+      <p class="muted center" id="lastTapTxt" style="margin-top:6px">You haven't checked in yet.</p>
+    </div>
+
+    <h2 class="section">Status <span class="link" onclick="openStatusEditor()">Customise</span></h2>
+    <div class="chips" id="statusChips"></div>
+
+    <div class="card" style="margin-top:13px">
+      <div class="row pt0" style="border:0;padding-bottom:6px">
+        <div class="flex" style="gap:0;flex-direction:column;align-items:flex-start">
+          <h3 style="margin:0">Send to</h3>
+          <div class="sub" id="pickSummary">Everyone in my circle</div>
+        </div>
+        <button class="btn ghost small" onclick="openPicker()">Choose</button>
+      </div>
+      <div class="chips" id="groupChips" style="margin-top:6px"></div>
+      <div class="chips" id="whoPreview" style="margin-top:8px"></div>
+    </div>
+
+    <div class="card">
+      <div class="row pt0" style="border:0;padding:0 0 4px">
+        <h3>Next check-in</h3>
+        <span class="badge" id="freqBadge">every 12 h</span>
+      </div>
+      <p class="muted">You get the reminder first. Your circle only hears something if you miss it.</p>
+      <div class="timer" id="cdown">--:--:--</div>
+      <div class="bar"><i id="cbar"></i></div>
+      <div class="grid2" style="margin-top:12px;margin-bottom:0">
+        <button class="btn ghost small" style="width:100%" onclick="snooze(2)">Snooze 2 h</button>
+        <button class="btn ghost small" style="width:100%" onclick="go('auto')">Settings</button>
+      </div>
+    </div>
+
+    <div class="card aicard" id="aiSuggest">
+      <div class="row pt0" style="border:0;padding:0 0 4px">
+        <h3>✨ Smart suggestion</h3><span class="badge ai">AI</span>
+      </div>
+      <p class="muted" id="aiText">Learning your routine…</p>
+      <div class="grid2" style="margin-top:11px;margin-bottom:0">
+        <button class="btn small" style="width:100%" onclick="acceptAI()">Yes, do it</button>
+        <button class="btn ghost small" style="width:100%" onclick="dismissAI()">Not now</button>
+      </div>
+    </div>
+
+    <div class="card sosbox">
+      <h3 style="color:var(--danger)">🚨 Emergency</h3>
+      <p class="muted">Press and hold 3 seconds. Your circle gets an alert with live location and can call emergency services.</p>
+      <button class="btn danger" id="sosBtn" style="margin-top:11px"
+        onpointerdown="holdStart(event)" onpointerup="holdEnd()" onpointercancel="holdEnd()" onpointerleave="holdEnd()">
+        Hold for Emergency</button>
+      <div class="holdbar"><i id="holdFill"></i></div>
+    </div>
+
+    <div class="grid3">
+      <div class="stat"><b id="stStreak">0</b><span>🏆 day streak</span></div>
+      <div class="stat"><b id="stTotal">0</b><span>check-ins</span></div>
+      <div class="stat"><b id="stBatt">—</b><span>🔋 battery</span></div>
+    </div>
+  </div>
+
+  <!-- ───── CIRCLE ───── -->
+  <div id="v-circle" class="hide">
+    <h2 class="section">My trusted circle <span class="link" onclick="openPicker()">Manage sending</span></h2>
+    <div class="card" id="circleList"></div>
+
+    <h2 class="section">Add someone</h2>
+    <div class="card">
+      <input id="cName" placeholder="Name (e.g. Mom)" />
+      <input id="cContact" placeholder="Phone number or email" />
+      <div class="grid2" style="margin-bottom:2px">
+        <select id="cRel">
+          <option>Parent</option><option>Partner</option><option>Sibling</option><option>Child</option>
+          <option>Friend</option><option>Grandparent</option><option>Caregiver</option><option>Colleague</option>
+        </select>
+        <select id="cGroup"><option>Family</option><option>Friends</option><option>Work</option><option>Emergency</option></select>
+      </div>
+      <button class="btn" onclick="addContact()">Send invite</button>
+      <p class="muted" style="margin-top:10px" id="limitNote"></p>
+    </div>
+
+    <h2 class="section">Family dashboard <span class="badge pro">Premium</span></h2>
+    <div class="card" id="dashList"></div>
+    <p class="muted" style="margin:-4px 2px 0">People who share their status with you. No constant texting required.</p>
+  </div>
+
+  <!-- ───── AUTOMATIONS ───── -->
+  <div id="v-auto" class="hide">
+    <h2 class="section">Automatic check-in</h2>
+    <div class="card">
+      <label class="lbl">Remind me to check in every</label>
+      <select id="freq" onchange="setFreq()">
+        <option value="6">6 hours</option><option value="12" selected>12 hours</option>
+        <option value="24">24 hours (daily)</option><option value="48">48 hours</option>
+      </select>
+      <label class="lbl">Grace period before my circle is told</label>
+      <select id="grace" onchange="saveSel('graceMin','grace')">
+        <option value="30">30 minutes</option><option value="60" selected>1 hour</option>
+        <option value="180">3 hours</option><option value="360">6 hours</option>
+      </select>
+      <div class="row"><div><div class="name">Missed check-in alert</div>
+        <div class="sub">Tell my circle if I don't respond. Always opt-in.</div></div>
+        <div class="switch on" data-k="missedAlert"><i></i></div></div>
+      <div class="row"><div><div class="name">Quiet hours · 22:00–07:00</div>
+        <div class="sub">No reminders while you sleep</div></div>
+        <div class="switch on" data-k="quiet"><i></i></div></div>
+      <div class="row"><div><div class="name">Smart reminders</div>
+        <div class="sub">Nudge me if I forget my usual check-in</div></div>
+        <div class="switch on" data-k="smartRemind"><i></i></div></div>
+    </div>
+
+    <h2 class="section">Scheduled check-ins</h2>
+    <div class="card" id="schedList"></div>
+    <div class="card tight">
+      <div class="grid3" style="margin-bottom:0;gap:8px">
+        <input id="schTime" type="time" value="08:00" style="margin:0" />
+        <select id="schStatus" style="margin:0"></select>
+        <button class="btn small" style="width:100%" onclick="addSchedule()">Add</button>
+      </div>
+    </div>
+
+    <h2 class="section">Places & arrival detection</h2>
+    <div class="card">
+      <p class="muted">When you reach a saved place, Tap sends the check-in for you — no button needed.</p>
+      <div id="placeList" style="margin-top:6px"></div>
+      <div class="grid2" style="margin:10px 0 0">
+        <input id="plName" placeholder="Gym" style="margin:0" />
+        <button class="btn ghost small" style="width:100%" onclick="addPlace()">Save this place</button>
+      </div>
+    </div>
+
+    <h2 class="section">Live journey</h2>
+    <div class="card" id="journeyCard">
+      <div id="journeyIdle">
+        <p class="muted">Your circle sees you're travelling and gets an automatic "Safe arrival" when you get there.</p>
+        <label class="lbl" style="margin-top:12px">I'm heading to</label>
+        <input id="jDest" placeholder="Home" />
+        <label class="lbl">Expected arrival in</label>
+        <select id="jMin">
+          <option value="15">15 minutes</option><option value="30" selected>30 minutes</option>
+          <option value="60">1 hour</option><option value="180">3 hours</option><option value="480">8 hours</option>
+        </select>
+        <button class="btn" onclick="startJourney()">Start journey</button>
+      </div>
+      <div id="journeyLive" class="hide">
+        <div class="row pt0" style="border:0;padding:0 0 6px"><h3>🚗 Travelling to <span id="jDestTxt"></span></h3>
+          <span class="badge ok">live</span></div>
+        <div class="timer" id="jTimer">--:--</div>
+        <div class="bar"><i id="jBar"></i></div>
+        <div class="grid2" style="margin-top:12px;margin-bottom:0">
+          <button class="btn small" style="width:100%" onclick="arriveJourney()">I've arrived</button>
+          <button class="btn ghost small" style="width:100%" onclick="cancelJourney()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section">Modes</h2>
+    <div class="card">
+      <div class="row pt0"><div><div class="name">✈️ Travel mode</div>
+        <div class="sub" id="travelSub">Share country, timezone and last check-in</div></div>
+        <div class="switch" data-k="travel"><i></i></div></div>
+      <div class="row"><div><div class="name">👵 Elderly mode</div>
+        <div class="sub">Bigger button, simpler screen, wellness checks</div></div>
+        <div class="switch" data-k="elder"><i></i></div></div>
+      <div class="row"><div><div class="name">🔋 Low battery alerts</div>
+        <div class="sub">Warn my circle below 15%</div></div>
+        <div class="switch on" data-k="battAlert"><i></i></div></div>
+      <div class="row"><div><div class="name">⌚ Watch & widget</div>
+        <div class="sub">Tap from Apple Watch, Wear OS or home screen</div></div>
+        <span class="badge pro">Premium</span></div>
+      <div class="row"><div><div class="name">🎙 Voice check-in</div>
+        <div class="sub">"Hey Siri, tell Tap I'm okay"</div></div>
+        <span class="badge pro">Premium</span></div>
+    </div>
+  </div>
+
+  <!-- ───── ACTIVITY ───── -->
+  <div id="v-activity" class="hide">
+    <h2 class="section">History <span class="link" onclick="clearFeed()">Clear</span></h2>
+    <div class="grid2">
+      <div class="stat"><b id="stWeek">0</b><span>this week</span></div>
+      <div class="stat"><b id="stOnTime">100%</b><span>on time</span></div>
+    </div>
+    <div class="card"><div class="feed" id="feed"></div></div>
+    <p class="muted center" id="histNote"></p>
+  </div>
+
+  <!-- ───── ME ───── -->
+  <div id="v-me" class="hide">
+    <div class="card center">
+      <div class="avatar" id="bigAvatar" style="width:66px;height:66px;font-size:27px;margin:2px auto 10px"></div>
+      <h3 id="meName">—</h3>
+      <p class="muted" id="meEmail">—</p>
+      <p class="muted" id="trialInfo" style="margin-top:8px"></p>
+    </div>
+
+    <h2 class="section">Location privacy</h2>
+    <div class="card">
+      <p class="muted" style="margin-bottom:12px">You never have to share live location. Always under your control.</p>
+      <div class="privacy-opt" data-p="status"><div class="radio"></div>
+        <div><div class="name">Status only</div><div class="sub">No location at all</div></div></div>
+      <div class="privacy-opt on" data-p="approx"><div class="radio"></div>
+        <div><div class="name">Approximate area</div><div class="sub">City or neighbourhood</div></div></div>
+      <div class="privacy-opt" data-p="exact"><div class="radio"></div>
+        <div><div class="name">Exact location</div><div class="sub">Precise point, with each check-in</div></div></div>
+      <div class="privacy-opt" data-p="temp"><div class="radio"></div>
+        <div><div class="name">Temporary live location</div><div class="sub">During journeys and emergencies only</div></div></div>
+    </div>
+
+    <h2 class="section">Your plan</h2>
+    <div class="price" data-p="monthly"><b>Premium — $0.99 / month</b>
+      <p class="muted" style="margin-top:3px">Everything unlocked, billed monthly.</p></div>
+    <div class="price on" data-p="yearly"><span class="badge best tag">Best value · save 33%</span>
+      <b>Premium Yearly — $7.99 / year</b>
+      <p class="muted" style="margin-top:3px">That's $0.67 a month <span class="strike">$11.88</span> — one payment, no monthly reminder.</p></div>
+    <div class="price" data-p="family"><b>Family — $2.49 / month</b>
+      <p class="muted" style="margin-top:3px">Up to 6 members with a shared family dashboard.</p></div>
+    <button class="btn" onclick="subscribe()" id="subBtn">Start Premium</button>
+    <p class="muted center" style="margin-top:9px">Regional pricing applies — lower prices in lower-income markets.</p>
+
+    <h2 class="section">What Premium unlocks</h2>
+    <div class="card">
+      <div class="kv"><span>Trusted contacts</span><b>Unlimited <span class="sub">(free: 5)</span></b></div>
+      <div class="kv"><span>Check-in history</span><b>Unlimited <span class="sub">(free: 7 days)</span></b></div>
+      <div class="kv"><span>Automatic arrival check-ins</span><b>✓</b></div>
+      <div class="kv"><span>Live journey tracking</span><b>✓</b></div>
+      <div class="kv"><span>Battery alerts</span><b>✓</b></div>
+      <div class="kv"><span>Watch, widget & voice</span><b>✓</b></div>
+      <div class="kv"><span>AI routine learning</span><b>✓</b></div>
+      <div class="kv"><span>Family dashboard</span><b>✓</b></div>
+      <div class="kv"><span>Custom notification sounds</span><b>✓</b></div>
+      <div class="kv"><span>Priority support</span><b>✓</b></div>
+    </div>
+
+    <h2 class="section">Security & privacy</h2>
+    <div class="card">
+      <div class="row pt0"><div><div class="name">🔒 Encrypted communication</div>
+        <div class="sub">Check-ins encrypted in transit and at rest</div></div><span class="badge ok">on</span></div>
+      <div class="row"><div><div class="name">✅ Verified email or phone</div>
+        <div class="sub">Only verified people join a circle</div></div><span class="badge ok">on</span></div>
+      <div class="row"><div><div class="name">🇪🇺 GDPR-friendly design</div>
+        <div class="sub">Export or delete your data any time</div></div><span class="badge ok">on</span></div>
+      <div class="row"><div><div class="name">Export my data</div>
+        <div class="sub">Download everything as JSON</div></div>
+        <span class="link" onclick="exportData()">Export</span></div>
+      <div class="row"><div><div class="name">Delete my account</div>
+        <div class="sub">Erases everything instantly</div></div>
+        <span class="link" style="color:var(--danger)" onclick="wipe()">Delete</span></div>
+    </div>
+    <button class="btn ghost" onclick="wipe()" style="margin-bottom:14px">Sign out</button>
+  </div>
+
+  </main>
+
+  <nav>
+    <button id="n-home" class="on" onclick="go('home')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.2l2.4 2.4 4.6-4.8"/></svg>Tap</button>
+    <button id="n-circle" onclick="go('circle')">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.4 2.7-5.2 6-5.2s6 1.8 6 5.2"/><path d="M17 11.2a3.1 3.1 0 100-6.2"/><path d="M18.2 20c0-2.3-.8-3.9-2.2-4.8"/></svg>Circle</button>
+    <button id="n-auto" onclick="go('auto')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.2V12l3.2 2"/></svg>Auto</button>
+    <button id="n-activity" onclick="go('activity')">
+      <svg viewBox="0 0 24 24"><path d="M3 12h3.6l2.6 6.6 3.8-13.2 2.6 6.6H21"/></svg>History</button>
+    <button id="n-me" onclick="go('me')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M4.6 20c0-3.7 3.4-5.7 7.4-5.7s7.4 2 7.4 5.7"/></svg>Me</button>
+  </nav>
+</div>
+
+<!-- ══════════ PICKER MODAL ══════════ -->
+<div class="modal" id="pickerModal" onclick="if(event.target===this)closePicker()">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="mhead"><h3>Who should get this tap?</h3>
+      <span class="link" onclick="selectAll()">Select all</span></div>
+    <p class="muted" style="margin-bottom:12px">You choose who receives updates. Not everyone.</p>
+    <div class="chips" id="pickerGroups" style="margin-bottom:6px"></div>
+    <div id="pickerList"></div>
+    <div class="row" style="border-top:1px solid var(--line);border-bottom:0;margin-top:6px">
+      <div><div class="name">Remember this for this status</div>
+        <div class="sub" id="rememberSub">Use these people whenever I send it</div></div>
+      <div class="switch on" id="swRemember" onclick="this.classList.toggle('on')"><i></i></div>
+    </div>
+    <button class="btn" onclick="closePicker(true)" id="pickerDone">Done</button>
+  </div>
+</div>
+
+<!-- ══════════ STATUS EDITOR MODAL ══════════ -->
+<div class="modal" id="statusModal" onclick="if(event.target===this)closeStatusEditor()">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="mhead"><h3>Your statuses</h3></div>
+    <p class="muted" style="margin-bottom:12px">One tap can send different things. Turn off what you don't use.</p>
+    <div id="statusEditList"></div>
+    <h2 class="section">Add a custom status</h2>
+    <div class="grid3" style="gap:8px;grid-template-columns:56px 1fr 74px">
+      <input id="stEmoji" placeholder="🎉" maxlength="3" style="margin:0;text-align:center" />
+      <input id="stLabel" placeholder="At the gym" style="margin:0" />
+      <button class="btn small" style="width:100%" onclick="addStatus()">Add</button>
+    </div>
+    <button class="btn ghost" onclick="closeStatusEditor()" style="margin-top:14px">Done</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   TAP — prototype (single file, no backend)
+   State persists in localStorage.
+   ═══════════════════════════════════════════════ */
+const KEY='tap.v2';
+let S=null, activeStatus=0, pickTemp=[], activeGroup='all';
+
+const DEFAULT_STATUSES=[
+  {e:'🟢',l:"I'm okay",     sub:'"I\'m Safe"',        on:true},
+  {e:'🏠',l:'Arrived Home',  sub:'Home safe',          on:true},
+  {e:'🚗',l:'Leaving Now',   sub:'On my way',          on:true},
+  {e:'🏢',l:'Arrived at Work',sub:'At work',           on:true},
+  {e:'🎓',l:'Arrived at School',sub:'At school',       on:false},
+  {e:'✈️',l:'Landed',        sub:'Landed safely',      on:true},
+  {e:'🏃',l:'Going for a Run',sub:'Out running',       on:false},
+  {e:'🚶',l:'Walking Home',  sub:'Walking home',       on:true},
+  {e:'🏥',l:'At Hospital',   sub:'At hospital',        on:false},
+  {e:'🌙',l:'Going to Sleep',sub:'Goodnight',          on:true}
+];
+
+/* ── persistence ── */
+function load(){ try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null} }
+function save(){ localStorage.setItem(KEY,JSON.stringify(S)) }
+
+function fresh(name,email,country){
+  const now=Date.now();
+  return {
+    user:{name,email,country},
+    createdAt:now, plan:'trial', theme:'dark',
+    contacts:[
+      {id:1,n:'Mom',    c:'+250 78 000 0001',r:'Parent', g:'Family',   em:'👩',on:true,last:now-40*60e3,   st:"I'm okay",     batt:82,loc:'Home'},
+      {id:2,n:'Dad',    c:'+250 78 000 0002',r:'Parent', g:'Family',   em:'👨',on:true,last:now-3*3600e3,  st:'Arrived at Work',batt:47,loc:'Work'},
+      {id:3,n:'Sarah',  c:'sarah@example.com',r:'Partner',g:'Family',  em:'❤️',on:true,last:now-3*60e3,    st:'Arrived Home', batt:64,loc:'Home'},
+      {id:4,n:'Divine', c:'+250 78 000 0004',r:'Sibling',g:'Family',   em:'👧',on:false,last:now-14*3600e3,st:'Walking Home', batt:9, loc:'Unknown'},
+      {id:5,n:'Eric',   c:'eric@example.com', r:'Friend', g:'Friends',  em:'👦',on:false,last:now-26*3600e3,st:"I'm okay",    batt:71,loc:'—'}
+    ],
+    statuses:JSON.parse(JSON.stringify(DEFAULT_STATUSES)),
+    recipients:{},            // statusLabel -> [contactId]
+    schedules:[{t:'08:00',s:'Arrived at Work',on:true},{t:'22:00',s:'Arrived Home',on:true}],
+    places:[{n:'Home',s:'Arrived Home',on:true},{n:'Work',s:'Arrived at Work',on:true}],
+    events:[], taps:0, streak:0, lastTap:null, tapDays:[],
+    freq:12, graceMin:60, nextDue:now+12*3600e3, missedFired:false,
+    privacy:'approx', batt:78,
+    quiet:true, smartRemind:true, missedAlert:true, battAlert:true, travel:false, elder:false,
+    journey:null, aiDismissed:0, aiIdx:0
+  };
+}
+
+/* ── auth ── */
+function signup(){
+  const n=val('aName')||'Friend', e=val('aEmail')||'you@example.com', c=val('aCountry');
+  S=fresh(n,e,c);
+  push('Welcome to Tap. Your 30-day free trial has started.','sys');
+  push('Mom, Dad and Sarah joined your trusted circle.','sys');
+  save(); boot();
+}
+function val(id){ const el=document.getElementById(id); return el?el.value.trim():'' }
+function wipe(){ if(confirm('Delete everything and sign out?')){ localStorage.removeItem(KEY); location.reload() } }
+function exportData(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='tap-my-data.json'; a.click(); toast('Your data was exported');
+}
+
+/* ── boot ── */
+function boot(){
+  S=S||load();
+  if(!S){ show('auth',true); show('app',false); return }
+  show('auth',false); show('app',true);
+  document.body.classList.toggle('light',S.theme==='light');
+  document.body.classList.toggle('elder',!!S.elder);
+  document.getElementById('themeBtn').textContent=S.theme==='light'?'☀️':'🌙';
+  document.getElementById('headName').textContent=S.user.name;
+  document.getElementById('bigAvatar').textContent=S.user.name[0].toUpperCase();
+  document.getElementById('meName').textContent=S.user.name;
+  document.getElementById('meEmail').textContent=S.user.email+' · '+S.user.country;
+  document.getElementById('freq').value=S.freq;
+  document.getElementById('grace').value=S.graceMin;
+  greet(); bindSwitches(); bindPrivacy(); bindPrices();
+  readBattery(); renderAll(); nextAI();
+}
+function show(id,on){ const e=document.getElementById(id); e.classList.toggle('hide',!on);
+  if(id==='auth') e.style.display=on?'flex':'none';
+  if(id==='app')  e.style.display=on?'flex':'none'; }
+function greet(){
+  const h=new Date().getHours();
+  document.getElementById('greet').textContent =
+    h<5?'Still up?':h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+}
+
+/* ── switches / options ── */
+function bindSwitches(){
+  document.querySelectorAll('.switch[data-k]').forEach(sw=>{
+    const k=sw.dataset.k;
+    sw.classList.toggle('on',!!S[k]);
+    sw.onclick=()=>{
+      S[k]=!S[k]; sw.classList.toggle('on',S[k]);
+      if(k==='elder') document.body.classList.toggle('elder',S[k]);
+      if(k==='travel') push(S[k]?'Travel mode on — your circle sees your country, timezone and last check-in.'
+                                 :'Travel mode off.','sys');
+      save(); renderAll();
+      toast(prettyKey(k)+(S[k]?' on':' off'));
+    };
+  });
+}
+function prettyKey(k){ return ({quiet:'Quiet hours',smartRemind:'Smart reminders',missedAlert:'Missed check-in alert',
+  battAlert:'Battery alerts',travel:'Travel mode',elder:'Elderly mode'})[k]||k }
+function bindPrivacy(){
+  document.querySelectorAll('.privacy-opt').forEach(o=>{
+    o.classList.toggle('on',o.dataset.p===S.privacy);
+    o.onclick=()=>{ S.privacy=o.dataset.p; save(); bindPrivacy();
+      toast('Location: '+({status:'status only',approx:'approximate area',exact:'exact',temp:'temporary live'})[S.privacy]); };
+  });
+}
+let chosenPlan='yearly';
+function bindPrices(){
+  document.querySelectorAll('.price').forEach(p=>{
+    p.onclick=()=>{ document.querySelectorAll('.price').forEach(x=>x.classList.remove('on'));
+      p.classList.add('on'); chosenPlan=p.dataset.p; };
+  });
+}
+function subscribe(){
+  S.plan=chosenPlan; save(); renderAll();
+  push('Premium activated ('+chosenPlan+'). Everything unlocked.','sys');
+  toast('Premium active — thank you 💚');
+}
+function isPro(){ return S.plan!=='free' }
+function toggleTheme(){ S.theme=S.theme==='light'?'dark':'light'; save(); boot(); }
+function saveSel(key,id){ S[key]=+document.getElementById(id).value; save();
+  toast('Grace period: '+(S.graceMin>=60?(S.graceMin/60)+' h':S.graceMin+' min')); }
+
+/* ── navigation ── */
+function go(v){
+  ['home','circle','auto','activity','me'].forEach(x=>{
+    document.getElementById('v-'+x).classList.toggle('hide',x!==v);
+    document.getElementById('n-'+x).classList.toggle('on',x===v);
+  });
+  document.querySelector('main').scrollTop=0;
+}
+
+/* ── statuses ── */
+function renderStatuses(){
+  const box=document.getElementById('statusChips'); box.innerHTML='';
+  S.statuses.forEach((s,i)=>{
+    if(!s.on) return;
+    const c=document.createElement('span');
+    c.className='chip'+(i===activeStatus?' on':'');
+    c.textContent=s.e+' '+s.l;
+    c.onclick=()=>{ activeStatus=i; syncTapFace(); renderStatuses(); renderPickPreview(); };
+    box.appendChild(c);
+  });
+  const add=document.createElement('span');
+  add.className='chip add'; add.textContent='+ custom';
+  add.onclick=openStatusEditor; box.appendChild(add);
+  syncTapFace();
+}
+function syncTapFace(){
+  const s=S.statuses[activeStatus]||S.statuses[0];
+  document.getElementById('tapEmoji').textContent=s.e;
+  document.getElementById('tapSub').textContent=s.sub||('"'+s.l+'"');
+}
+function openStatusEditor(){
+  const box=document.getElementById('statusEditList'); box.innerHTML='';
+  S.statuses.forEach((s,i)=>{
+    const d=document.createElement('div'); d.className='row';
+    d.innerHTML=`<div class="flex"><div class="avatar">${s.e}</div>
+      <div><div class="name">${s.l}</div><div class="sub">${s.custom?'Custom':'Built-in'}</div></div></div>`;
+    const sw=document.createElement('div'); sw.className='switch'+(s.on?' on':'');
+    sw.innerHTML='<i></i>';
+    sw.onclick=()=>{ s.on=!s.on; sw.classList.toggle('on',s.on);
+      if(!S.statuses[activeStatus].on) activeStatus=S.statuses.findIndex(x=>x.on);
+      save(); renderStatuses(); };
+    d.appendChild(sw); box.appendChild(d);
+  });
+  document.getElementById('statusModal').classList.add('show');
+}
+function closeStatusEditor(){ document.getElementById('statusModal').classList.remove('show'); renderStatuses(); }
+function addStatus(){
+  const e=val('stEmoji')||'⭐', l=val('stLabel');
+  if(!l) return toast('Give your status a name');
+  S.statuses.push({e,l,sub:'"'+l+'"',on:true,custom:true});
+  document.getElementById('stEmoji').value=''; document.getElementById('stLabel').value='';
+  save(); openStatusEditor(); renderStatuses(); refreshSchedStatusOptions(); toast('"'+l+'" added');
+}
+
+/* ── recipients / picker ── */
+function currentStatusLabel(){ return (S.statuses[activeStatus]||S.statuses[0]).l }
+function recipientsFor(label){
+  const saved=S.recipients[label];
+  if(saved && saved.length) return S.contacts.filter(c=>saved.includes(c.id));
+  if(activeGroup!=='all') return S.contacts.filter(c=>c.on && c.g===activeGroup);
+  return S.contacts.filter(c=>c.on);
+}
+function renderGroupChips(){
+  const groups=['all',...new Set(S.contacts.map(c=>c.g))];
+  const box=document.getElementById('groupChips'); box.innerHTML='';
+  groups.forEach(g=>{
+    const c=document.createElement('span');
+    c.className='chip'+(g===activeGroup?' on':'');
+    c.textContent=g==='all'?'Everyone':g;
+    c.onclick=()=>{ activeGroup=g; delete S.recipients[currentStatusLabel()];
+      save(); renderGroupChips(); renderPickPreview(); };
+    box.appendChild(c);
+  });
+}
+function renderPickPreview(){
+  const list=recipientsFor(currentStatusLabel());
+  document.getElementById('pickSummary').textContent =
+    list.length===0 ? 'Nobody selected yet'
+    : list.length===S.contacts.length ? 'Everyone in my circle'
+    : list.length+' '+(list.length===1?'person':'people')+' selected';
+  const box=document.getElementById('whoPreview'); box.innerHTML='';
+  list.slice(0,6).forEach(c=>{
+    const s=document.createElement('span'); s.className='chip on';
+    s.textContent=c.em+' '+c.n; box.appendChild(s);
+  });
+  if(!list.length){ const s=document.createElement('span'); s.className='chip';
+    s.textContent='Tap "Choose" to pick people'; box.appendChild(s); }
+}
+function openPicker(){
+  pickTemp=recipientsFor(currentStatusLabel()).map(c=>c.id);
+  document.getElementById('rememberSub').textContent='Use these people whenever I send "'+currentStatusLabel()+'"';
+  renderPickerGroups(); renderPickerList();
+  document.getElementById('pickerModal').classList.add('show');
+}
+function renderPickerGroups(){
+  const groups=[...new Set(S.contacts.map(c=>c.g))];
+  const box=document.getElementById('pickerGroups'); box.innerHTML='';
+  groups.forEach(g=>{
+    const ids=S.contacts.filter(c=>c.g===g).map(c=>c.id);
+    const all=ids.every(i=>pickTemp.includes(i));
+    const c=document.createElement('span');
+    c.className='chip'+(all?' on':'');
+    c.textContent=(all?'✓ ':'')+g;
+    c.onclick=()=>{ if(all) pickTemp=pickTemp.filter(i=>!ids.includes(i));
+                    else ids.forEach(i=>{ if(!pickTemp.includes(i)) pickTemp.push(i) });
+                    renderPickerGroups(); renderPickerList(); };
+    box.appendChild(c);
+  });
+}
+function renderPickerList(){
+  const box=document.getElementById('pickerList'); box.innerHTML='';
+  S.contacts.forEach(c=>{
+    const on=pickTemp.includes(c.id);
+    const d=document.createElement('div'); d.className='row selrow';
+    d.innerHTML=`<div class="flex"><div class="avatar">${c.em}</div>
+      <div><div class="name">${c.n}</div><div class="sub">${c.r} · ${c.g}</div></div></div>
+      <div class="check${on?' on':''}">✓</div>`;
+    d.onclick=()=>{ pickTemp=on?pickTemp.filter(i=>i!==c.id):[...pickTemp,c.id];
+                    renderPickerList(); renderPickerGroups(); };
+    box.appendChild(d);
+  });
+  document.getElementById('pickerDone').textContent =
+    pickTemp.length? 'Done · '+pickTemp.length+' selected' : 'Done';
+}
+function selectAll(){
+  pickTemp = pickTemp.length===S.contacts.length ? [] : S.contacts.map(c=>c.id);
+  renderPickerList(); renderPickerGroups();
+}
+function closePicker(apply){
+  if(apply){
+    const remember=document.getElementById('swRemember').classList.contains('on');
+    S.contacts.forEach(c=>c.on=pickTemp.includes(c.id));
+    if(remember) S.recipients[currentStatusLabel()]=[...pickTemp];
+    else delete S.recipients[currentStatusLabel()];
+    activeGroup='all'; save(); renderAll();
+    toast(pickTemp.length+' selected');
+  }
+  document.getElementById('pickerModal').classList.remove('show');
+}
+
+/* ── the tap ── */
+function doTap(silent){
+  const st=S.statuses[activeStatus]||S.statuses[0];
+  const who=recipientsFor(st.l);
+  if(!who.length && !silent){ toast('Choose at least one person first'); openPicker(); return }
+
+  const ring=document.getElementById('ring'), mark=document.getElementById('sentMark');
+  [ring,mark].forEach(el=>{ el.classList.remove('go'); void el.offsetWidth; el.classList.add('go') });
+  if(navigator.vibrate) navigator.vibrate(45);
+
+  const now=Date.now(), day=new Date(now).toDateString();
+  if(!S.tapDays.includes(day)){
+    const y=new Date(now-864e5).toDateString();
+    S.streak = S.tapDays.includes(y) ? S.streak+1 : 1;
+    S.tapDays.push(day); if(S.tapDays.length>400) S.tapDays.shift();
+  }
+  S.lastTap=now; S.taps++; S.nextDue=now+S.freq*3600e3; S.missedFired=false;
+
+  const loc = S.privacy==='status' ? '' :
+              S.privacy==='exact'  ? ' · 52.3702, 4.8952' :
+              S.privacy==='temp'   ? '' : ' · Amsterdam, NL';
+  const names=who.map(c=>c.em+' '+c.n).join(', ');
+  push(`${st.e} "${st.l}" sent to ${names}${loc}`,'ok');
+  save(); renderAll();
+  toast(`Sent to ${who.length} ${who.length===1?'person':'people'} ✓`);
+}
+
+/* ── emergency ── */
+let holdT=null,holdP=0;
+function holdStart(ev){
+  if(ev&&ev.preventDefault) ev.preventDefault();
+  holdP=0; const b=document.getElementById('sosBtn'), f=document.getElementById('holdFill');
+  holdT=setInterval(()=>{
+    holdP+=100/30; f.style.width=Math.min(100,holdP)+'%';
+    b.textContent='Hold… '+Math.ceil(3-holdP*3/100)+'s';
+    if(navigator.vibrate && holdP%20<4) navigator.vibrate(12);
+    if(holdP>=100){ holdEnd(); fireSOS() }
+  },100);
+}
+function holdEnd(){
+  clearInterval(holdT); holdT=null; holdP=0;
+  document.getElementById('holdFill').style.width='0%';
+  document.getElementById('sosBtn').textContent='Hold for Emergency';
+}
+function fireSOS(){
+  if(navigator.vibrate) navigator.vibrate([90,60,90,60,240]);
+  const who=S.contacts.map(c=>c.em+' '+c.n).join(', ');
+  push(`🚨 EMERGENCY alert sent to ${who} with live location (52.3702, 4.8952). Emergency services offered.`,'sos');
+  save(); renderAll();
+  toast('🚨 Emergency alert sent — help is being contacted');
+}
+
+/* ── contacts ── */
+const EMOJI={Parent:'👩',Partner:'❤️',Sibling:'👧',Child:'🧒',Friend:'👦',Grandparent:'👵',Caregiver:'🧑‍⚕️',Colleague:'🧑‍💼'};
+function addContact(){
+  const n=val('cName'), c=val('cContact');
+  if(!n||!c) return toast('Name and contact are required');
+  const limit=isPro()?999:5;
+  if(S.contacts.length>=limit) return toast('Free plan is limited to 5 contacts — upgrade for unlimited');
+  const r=val('cRel'), g=val('cGroup');
+  S.contacts.push({id:Date.now(),n,c,r,g,em:EMOJI[r]||'🙂',on:true,last:null,st:'Invited',batt:null,loc:'—'});
+  document.getElementById('cName').value=''; document.getElementById('cContact').value='';
+  push(`Invite sent to ${n} (${r}, ${g}).`,'sys');
+  save(); renderAll(); toast(n+' invited to your circle');
+}
+function removeContact(id){
+  const c=S.contacts.find(x=>x.id===id); if(!c) return;
+  if(!confirm('Remove '+c.n+' from your circle?')) return;
+  S.contacts=S.contacts.filter(x=>x.id!==id);
+  Object.keys(S.recipients).forEach(k=>S.recipients[k]=S.recipients[k].filter(i=>i!==id));
+  save(); renderAll(); toast(c.n+' removed');
+}
+function toggleContact(id){
+  const c=S.contacts.find(x=>x.id===id); c.on=!c.on; save(); renderAll();
+}
+
+/* ── schedules & places ── */
+function refreshSchedStatusOptions(){
+  const sel=document.getElementById('schStatus'); if(!sel) return;
+  sel.innerHTML=''; S.statuses.filter(s=>s.on).forEach(s=>{
+    const o=document.createElement('option'); o.textContent=s.l; sel.appendChild(o) });
+}
+function addSchedule(){
+  const t=document.getElementById('schTime').value, s=document.getElementById('schStatus').value;
+  if(!t) return toast('Pick a time');
+  S.schedules.push({t,s,on:true}); save(); renderSchedules();
+  toast('Scheduled — "'+s+'" at '+t);
+}
+function renderSchedules(){
+  const box=document.getElementById('schedList'); box.innerHTML='';
+  if(!S.schedules.length) box.innerHTML='<p class="muted">No scheduled check-ins yet. Add one below — Tap will send it for you.</p>';
+  S.schedules.forEach((s,i)=>{
+    const d=document.createElement('div'); d.className='row';
+    d.innerHTML=`<div class="flex"><div class="avatar">⏰</div>
+      <div><div class="name">${s.t} · ${s.s}</div><div class="sub">Every day, sent automatically</div></div></div>`;
+    const wrap=document.createElement('div'); wrap.className='flex'; wrap.style.flex='0 0 auto';
+    const sw=document.createElement('div'); sw.className='switch'+(s.on?' on':''); sw.innerHTML='<i></i>';
+    sw.onclick=()=>{ s.on=!s.on; sw.classList.toggle('on',s.on); save() };
+    const rm=document.createElement('span'); rm.className='link'; rm.textContent='✕';
+    rm.onclick=()=>{ S.schedules.splice(i,1); save(); renderSchedules() };
+    wrap.append(sw,rm); d.appendChild(wrap); box.appendChild(d);
+  });
+}
+function addPlace(){
+  const n=val('plName'); if(!n) return toast('Name the place');
+  if(!isPro()) return toast('Arrival detection is a Premium feature');
+  S.places.push({n,s:"I'm okay",on:true});
+  document.getElementById('plName').value=''; save(); renderPlaces();
+  toast(n+' saved — arrival will check you in automatically');
+}
+function renderPlaces(){
+  const box=document.getElementById('placeList'); box.innerHTML='';
+  S.places.forEach((p,i)=>{
+    const d=document.createElement('div'); d.className='row';
+    d.innerHTML=`<div class="flex"><div class="avatar">📍</div>
+      <div><div class="name">${p.n}</div><div class="sub">Sends "${p.s}" on arrival</div></div></div>`;
+    const wrap=document.createElement('div'); wrap.className='flex'; wrap.style.flex='0 0 auto';
+    const sw=document.createElement('div'); sw.className='switch'+(p.on?' on':''); sw.innerHTML='<i></i>';
+    sw.onclick=()=>{ p.on=!p.on; sw.classList.toggle('on',p.on); save() };
+    const rm=document.createElement('span'); rm.className='link'; rm.textContent='✕';
+    rm.onclick=()=>{ S.places.splice(i,1); save(); renderPlaces() };
+    wrap.append(sw,rm); d.appendChild(wrap); box.appendChild(d);
+  });
+}
+
+/* ── journey ── */
+function startJourney(){
+  const d=val('jDest')||'my destination', m=+document.getElementById('jMin').value;
+  S.journey={dest:d,start:Date.now(),end:Date.now()+m*60e3};
+  push(`🚗 Journey started to ${d}. Circle notified · ETA ${m} min.`,'ok');
+  save(); renderJourney(); go('home'); toast('Journey started — your circle can see your ETA');
+}
+function arriveJourney(){
+  const d=S.journey?S.journey.dest:'destination';
+  S.journey=null;
+  push(`✅ Safe arrival at ${d}. Circle notified automatically.`,'ok');
+  S.lastTap=Date.now(); S.taps++; S.nextDue=Date.now()+S.freq*3600e3;
+  save(); renderAll(); toast('Safe arrival sent 💚');
+}
+function cancelJourney(){ S.journey=null; push('Journey cancelled.','sys'); save(); renderAll() }
+function renderJourney(){
+  const live=!!S.journey;
+  document.getElementById('journeyIdle').classList.toggle('hide',live);
+  document.getElementById('journeyLive').classList.toggle('hide',!live);
+  if(live) document.getElementById('jDestTxt').textContent=S.journey.dest;
+}
+
+/* ── AI suggestions ── */
+const AI=[
+  {t:'You usually get home around 20:00 on Fridays. Want me to send "Arrived Home" automatically when you get there?',a:()=>{S.places.push({n:'Home (Friday)',s:'Arrived Home',on:true}); return 'Automatic Friday home check-in enabled'}},
+  {t:'You check in most mornings at 08:10. Shall I schedule "Arrived at Work" for weekdays?',a:()=>{S.schedules.push({t:'08:10',s:'Arrived at Work',on:true}); return 'Weekday work check-in scheduled'}},
+  {t:'Divine has not checked in for 14 hours and her battery was at 9%. Want me to send her a gentle nudge?',a:()=>'Gentle nudge sent to Divine'},
+  {t:'Your battery often drops below 15% in the evening. Enable low-battery alerts so your circle knows why you went quiet?',a:()=>{S.battAlert=true; return 'Low battery alerts enabled'}},
+  {t:'You travel on Sunday evenings. Want journey mode to start automatically when you leave home?',a:()=>'Automatic journey mode enabled for Sunday evenings'}
+];
+function nextAI(){
+  const card=document.getElementById('aiSuggest');
+  if(!isPro()){ card.classList.add('lock');
+    document.getElementById('aiText').textContent='AI routine learning is part of Premium. It notices your patterns and offers to check you in automatically.';
+    return; }
+  card.classList.remove('lock');
+  document.getElementById('aiText').textContent=AI[S.aiIdx%AI.length].t;
+}
+function acceptAI(){
+  if(!isPro()){ go('me'); return toast('Upgrade to Premium for AI features') }
+  const msg=AI[S.aiIdx%AI.length].a();
+  push('✨ '+msg,'ai'); S.aiIdx++; save(); renderAll(); nextAI(); toast(msg);
+}
+function dismissAI(){ S.aiIdx++; save(); nextAI(); }
+
+/* ── feed ── */
+function push(text,kind){ S.events.unshift({text,kind:kind||'ok',t:Date.now()}) }
+function clearFeed(){ if(confirm('Clear your history?')){ S.events=[]; save(); renderAll() } }
+function ago(t){
+  if(!t) return 'never';
+  const s=(Date.now()-t)/1000;
+  if(s<60) return 'just now';
+  if(s<3600) return Math.floor(s/60)+' min ago';
+  if(s<86400) return Math.floor(s/3600)+' h ago';
+  return Math.floor(s/86400)+' d ago';
+}
+function clock(t){ return new Date(t).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) }
+
+/* ── battery ── */
+function readBattery(){
+  if(navigator.getBattery){
+    navigator.getBattery().then(b=>{
+      S.batt=Math.round(b.level*100); save(); renderStats();
+      b.addEventListener('levelchange',()=>{ S.batt=Math.round(b.level*100); save(); renderStats() });
+    }).catch(()=>{});
+  }
+}
+
+/* ── render ── */
+function renderAll(){
+  renderStatuses(); renderGroupChips(); renderPickPreview();
+  renderContacts(); renderDashboard(); renderSchedules(); renderPlaces();
+  renderJourney(); renderFeed(); renderStats(); refreshSchedStatusOptions();
+
+  document.getElementById('lastTapTxt').innerHTML = S.lastTap
+    ? `Last check-in · <b>${clock(S.lastTap)}</b> · ${ago(S.lastTap)}`
+    : "You haven't checked in yet.";
+  document.getElementById('freqBadge').textContent='every '+S.freq+' h';
+
+  const days=Math.max(0,30-Math.floor((Date.now()-S.createdAt)/864e5));
+  const pill=document.getElementById('planPill');
+  if(S.plan==='trial'){ pill.textContent='Trial · '+days+'d'; pill.className='pill' }
+  else if(S.plan==='free'){ pill.textContent='Free'; pill.className='pill' }
+  else { pill.textContent='Premium'; pill.className='pill pro' }
+  document.getElementById('trialInfo').textContent = S.plan==='trial'
+    ? `Free trial — ${days} day${days===1?'':'s'} remaining, then $7.99/year or $0.99/month.`
+    : S.plan==='free' ? 'Free plan — 5 contacts, 7 days of history.'
+    : 'Premium is active. Thank you for supporting Tap 💚';
+  document.getElementById('subBtn').textContent = isPro()&&S.plan!=='trial' ? 'Manage subscription' : 'Start Premium';
+  document.getElementById('limitNote').textContent = isPro()
+    ? 'Premium: unlimited trusted contacts.'
+    : `Free plan: ${S.contacts.length}/5 contacts used.`;
+  document.getElementById('histNote').textContent = isPro()
+    ? 'Premium keeps your full history.' : 'Free plan keeps 7 days of history.';
+}
+function renderContacts(){
+  const box=document.getElementById('circleList'); box.innerHTML='';
+  if(!S.contacts.length){ box.innerHTML='<p class="muted">No one yet. Add the people who worry about you.</p>'; return }
+  S.contacts.forEach(c=>{
+    const d=document.createElement('div'); d.className='row';
+    d.innerHTML=`<div class="flex"><div class="avatar">${c.em}</div>
+      <div><div class="name">${c.n}</div><div class="sub">${c.r} · ${c.g} · ${c.c}</div></div></div>`;
+    const wrap=document.createElement('div'); wrap.className='flex'; wrap.style.flex='0 0 auto';
+    const sw=document.createElement('div'); sw.className='switch'+(c.on?' on':''); sw.innerHTML='<i></i>';
+    sw.onclick=()=>toggleContact(c.id);
+    const rm=document.createElement('span'); rm.className='link'; rm.textContent='✕';
+    rm.onclick=()=>removeContact(c.id);
+    wrap.append(sw,rm); d.appendChild(wrap); box.appendChild(d);
+  });
+}
+function renderDashboard(){
+  const box=document.getElementById('dashList'); box.innerHTML='';
+  if(!isPro()){
+    box.innerHTML='<p class="muted">See everyone\'s status, battery and last check-in in one place — part of Premium.</p>'+
+      '<button class="btn ghost small" style="width:100%;margin-top:10px" onclick="go(\'me\')">See Premium</button>';
+    return;
+  }
+  S.contacts.filter(c=>c.last).forEach(c=>{
+    const hrs=(Date.now()-c.last)/3600e3;
+    const state = hrs<6?['ok','🟢 Safe']:hrs<12?['late','🟡 Quiet']:['bad','🔴 No check-in'];
+    const d=document.createElement('div'); d.className='row';
+    d.innerHTML=`<div class="flex"><div class="avatar">${c.em}
+        <span class="st" style="background:${hrs<6?'var(--accent)':hrs<12?'var(--warn)':'var(--danger)'}"></span></div>
+      <div><div class="name">${c.n}</div>
+        <div class="sub">${c.st} · ${ago(c.last)}</div>
+        <div class="sub">🔋 ${c.batt}% · 📍 ${c.loc}</div></div></div>
+      <span class="badge ${state[0]}">${state[1]}</span>`;
+    box.appendChild(d);
+  });
+}
+function renderFeed(){
+  const f=document.getElementById('feed'); f.innerHTML='';
+  const cut = isPro()? Infinity : Date.now()-7*864e5;
+  const list=S.events.filter(e=>e.t>=cut);
+  if(!list.length){ f.innerHTML='<p class="muted">Nothing yet. Your check-ins will appear here.</p>'; return }
+  list.slice(0,80).forEach(e=>{
+    const d=document.createElement('div'); d.className='item '+e.kind;
+    d.innerHTML=`<div style="font-size:13.5px;line-height:1.45">${e.text}</div>
+                 <div class="sub" style="margin-top:2px">${clock(e.t)} · ${ago(e.t)}</div>`;
+    f.appendChild(d);
+  });
+}
+function renderStats(){
+  document.getElementById('stStreak').textContent=S.streak;
+  document.getElementById('stTotal').textContent=S.taps;
+  document.getElementById('stBatt').textContent=(S.batt??'—')+'%';
+  const wk=S.events.filter(e=>e.kind==='ok'&&e.t>Date.now()-7*864e5).length;
+  document.getElementById('stWeek').textContent=wk;
+  const missed=S.events.filter(e=>e.kind==='miss').length;
+  const tot=wk+missed;
+  document.getElementById('stOnTime').textContent=tot?Math.round(wk/tot*100)+'%':'100%';
+}
+
+/* ── countdown & background logic ── */
+setInterval(()=>{
+  if(!S) return;
+  // check-in countdown
+  const left=S.nextDue-Date.now();
+  const el=document.getElementById('cdown'), bar=document.getElementById('cbar');
+  if(el){
+    if(left<=0){
+      el.textContent='OVERDUE'; el.className='timer late';
+      bar.style.width='100%'; bar.className='late';
+      const graceOver = Date.now() > S.nextDue + S.graceMin*60e3;
+      if(graceOver && !S.missedFired && S.missedAlert){
+        S.missedFired=true;
+        const who=S.contacts.filter(c=>c.on).map(c=>c.n).join(', ')||'your circle';
+        push(`⚠️ Check-in missed. ${who} received: "${S.user.name} hasn't checked in as expected today."`,'miss');
+        save(); renderAll(); toast('Missed check-in — your circle was notified');
+      }
+    }else{
+      const h=Math.floor(left/3600e3), m=Math.floor(left%3600e3/60e3), s=Math.floor(left%60e3/1000);
+      el.textContent=[h,m,s].map(x=>String(x).padStart(2,'0')).join(':');
+      el.className='timer'+(left<3600e3?' soon':'');
+      const pct=100-left/(S.freq*3600e3)*100;
+      bar.style.width=Math.max(0,Math.min(100,pct)).toFixed(1)+'%';
+      bar.className=left<3600e3?'soon':'';
+    }
+  }
+  // journey countdown
+  if(S.journey){
+    const jl=S.journey.end-Date.now(), tot=S.journey.end-S.journey.start;
+    const jt=document.getElementById('jTimer'), jb=document.getElementById('jBar');
+    if(jt){
+      if(jl<=0){ jt.textContent='ARRIVING'; jt.className='timer soon'; jb.style.width='100%' }
+      else{
+        const m=Math.floor(jl/60e3), s=Math.floor(jl%60e3/1000);
+        jt.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+        jt.className='timer'; jb.style.width=((tot-jl)/tot*100).toFixed(1)+'%';
+      }
+    }
+  }
+},1000);
+
+/* ── toast ── */
+let tt=null;
+function toast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+/* ── start ── */
+boot();
+</script>
+</body>
+</html>
